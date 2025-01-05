@@ -10,7 +10,7 @@ chip = "rp2040"
 [matrix]
 # Input and output pins are mandatory
 input_pins = ["PIN_8", "PIN_7", "PIN_6", "PIN_5", "PIN_4"]
-output_pins = ["PIN_14", "PIN_13", "PIN_12", "PIN_11", "PIN_10", "PIN_9"],
+output_pins = ["PIN_14", "PIN_13", "PIN_12", "PIN_11", "PIN_10", "PIN_9"]
 
 [layout]
 rows = 10
