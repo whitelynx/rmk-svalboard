@@ -232,8 +232,6 @@ keymap = [
 connection = "serial"
 
 [split.central]
-rows = 7
-cols = 6
 rows = 5
 cols = 6
 row_offset = 0
