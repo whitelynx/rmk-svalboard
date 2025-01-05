@@ -244,7 +244,7 @@ serial = [
 
 [split.central.matrix]
 input_pins = ["PIN_8", "PIN_7", "PIN_6", "PIN_5", "PIN_4"]
-output_pins = ["PIN_14", "PIN_13", "PIN_12", "PIN_11", "PIN_10", "PIN_9"],
+output_pins = ["PIN_14", "PIN_13", "PIN_12", "PIN_11", "PIN_10", "PIN_9"]
 
 [[split.peripheral]]
 rows = 5
@@ -257,4 +257,4 @@ serial = [
 
 [split.peripheral.matrix]
 input_pins = ["PIN_8", "PIN_7", "PIN_6", "PIN_5", "PIN_4"]
-output_pins = ["PIN_14", "PIN_13", "PIN_12", "PIN_11", "PIN_10", "PIN_9"],
+output_pins = ["PIN_14", "PIN_13", "PIN_12", "PIN_11", "PIN_10", "PIN_9"]
