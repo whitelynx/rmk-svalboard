@@ -61,10 +61,10 @@ async fn main(spawner: Spawner) {
     let flash = Flash::<_, Async, FLASH_SIZE>::new(p.FLASH, p.DMA_CH0);
 
     let keyboard_usb_config = KeyboardUsbConfig {
-        vid: 0x4c4b,
-        pid: 0x4643,
-        manufacturer: "Haobo",
-        product_name: "RMK Keyboard",
+        vid: 0x303A,
+        id: 0x4044,
+        manufacturer: "Svalboard",
+        product_name: "lightly",
         serial_number: "vial:f64c2b3c:000001",
     };
 
