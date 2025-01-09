@@ -36,7 +36,6 @@ use vial::{VIAL_KEYBOARD_DEF, VIAL_KEYBOARD_ID};
 
 bind_interrupts!(struct Irqs {
     USBCTRL_IRQ => InterruptHandler<USB>;
-    UART0_IRQ => uart::BufferedInterruptHandler<UART0>;
 });
 
 const FLASH_SIZE: usize = 2 * 1024 * 1024;
