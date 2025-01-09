@@ -3,6 +3,7 @@
 
 #[macro_use]
 mod macros;
+mod uart;
 
 use defmt::*;
 use defmt_rtt as _;
@@ -16,11 +17,11 @@ use embassy_rp::{
 };
 use panic_probe as _;
 use rmk::split::{peripheral::run_rmk_split_peripheral, SPLIT_MESSAGE_MAX_SIZE};
+use uart::BufferedHalfDuplexUart;
 use static_cell::StaticCell;
 
 bind_interrupts!(struct Irqs {
     USBCTRL_IRQ => InterruptHandler<USB>;
-    UART0_IRQ => uart::BufferedInterruptHandler<UART0>;
 });
 
 #[embassy_executor::main]
@@ -40,15 +41,7 @@ async fn main(_spawner: Spawner) {
     let tx_buf = &mut TX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
     static RX_BUF: StaticCell<[u8; SPLIT_MESSAGE_MAX_SIZE]> = StaticCell::new();
     let rx_buf = &mut RX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
-    let uart_instance = BufferedUart::new(
-        p.UART0,
-        Irqs,
-        p.PIN_0,
-        p.PIN_1,
-        tx_buf,
-        rx_buf,
-        uart::Config::default(),
-    );
+    let uart_instance = BufferedHalfDuplexUart::new(p.PIO1, p.PIN_0, tx_buf, rx_buf);
 
     // Start serving
     run_rmk_split_peripheral::<
