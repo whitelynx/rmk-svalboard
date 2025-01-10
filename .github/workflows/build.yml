@@ -7,7 +7,23 @@ on:
 
 jobs:
   build:
-    uses: grabpot/rmk/.github/workflows/user_build.yml@fix/splitserial
-    with:
-      keyboard_toml_path: "keyboard.toml"
-      vial_json_path: "vial.json"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: cargo-bins/cargo-binstall@main
+      - name: Install rmkit and cargo-make
+        run: cargo binstall cargo-make rmkit -y
+      - uses: actions/checkout@v3
+      - name: Install libssl
+        run: wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
+      - name: Build firmware
+        run: cargo make uf2 --release
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware_uf2
+          path: *.uf2
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware_hex
+          path: *.hex
