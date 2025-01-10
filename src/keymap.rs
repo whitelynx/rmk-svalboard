@@ -1,21 +1,25 @@
 use rmk::action::KeyAction;
-use rmk::{a, k, layer, mo};
+use rmk::keycode::ModifierCombination;
+use rmk::{a, k, layer, mo, wm};
 pub(crate) const COL: usize = 6;
 pub(crate) const ROW: usize = 10;
 pub(crate) const NUM_LAYER: usize = 16;
 
 #[rustfmt::skip]
 pub fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
+    let lalt = ModifierCombination::new_from(false, false, true, false, false);
+    let lctrl = ModifierCombination::new_from(false, false, false, false, true);
+    let lshift = ModifierCombination::new_from(false, false, false, true, false);
     [
         layer!([
-            [k!(LCtrl), k!(Tab), k!(LShift), k!(Enter), k!(MO(14)), k!(CapsLock)],
-            [k!(V), k!(G), k!(F), k!(R), k!(WM(Quote, LShift)), a!(No)],
+            [k!(LCtrl), k!(Tab), k!(LShift), k!(Enter), mo!(14), k!(CapsLock)],
+            [k!(V), k!(G), k!(F), k!(R), wm!(Quote, lshift), a!(No)],
             [k!(C), k!(T), k!(D), k!(E), k!(Grave), a!(No)],
             [k!(X), k!(B), k!(S), k!(W), k!(Escape), a!(No)],
             [k!(Z), k!(LeftBracket), k!(A), k!(Q), k!(Delete), a!(No)],
-            [k!(LAlt), k!(Backspace), k!(MO(4)), k!(Space), k!(MO(2)), k!(MO(5))],
+            [k!(LAlt), k!(Backspace), mo!(4), k!(Space), mo!(2), mo!(5)],
             [k!(M), k!(Quote), k!(J), k!(U), k!(H), a!(No)],
-            [k!(Comma), k!(WM(Semicolon, LShift)), k!(K), k!(I), k!(Y), a!(No)],
+            [k!(Comma), wm!(Semicolon, lshift), k!(K), k!(I), k!(Y), a!(No)],
             [k!(Dot), k!(LGui), k!(L), k!(O), k!(N), a!(No)],
             [k!(Slash), k!(Backslash), k!(Semicolon), k!(P), k!(RightBracket), a!(No)]
         ]),
@@ -37,11 +41,11 @@ pub fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
             [a!(No), a!(No), a!(No), a!(No), a!(No), a!(No)],
             [a!(No), a!(No), a!(No), a!(No), k!(Escape), a!(No)],
             [a!(No), a!(No), a!(No), a!(No), k!(Delete), a!(No)],
-            [k!(LAlt), k!(Backspace), k!(MO(4)), k!(Space), a!(No), a!(No)],
-            [k!(Home), k!(End), k!(Left), k!(WM(Left, LCtrl)), k!(Home), a!(No)],
-            [k!(PageDown), a!(No), k!(Down), k!(WM(Down, LCtrl)), a!(No), a!(No)],
-            [k!(PageUp), a!(No), k!(UP), k!(WM(UP, LCtrl)), k!(Insert), a!(No)],
-            [k!(End), a!(No), k!(Right), k!(WM(Right, LCtrl)), a!(No), a!(No)]
+            [k!(LAlt), k!(Backspace), mo!(4), k!(Space), a!(No), a!(No)],
+            [k!(Home), k!(End), k!(Left), wm!(Left, lctrl), k!(Home), a!(No)],
+            [k!(PageDown), a!(No), k!(Down), wm!(Down, lctrl), a!(No), a!(No)],
+            [k!(PageUp), a!(No), k!(UP), wm!(UP, lctrl), k!(Insert), a!(No)],
+            [k!(End), a!(No), k!(Right), wm!(Right, lctrl), a!(No), a!(No)]
         ]),
         layer!([
             [a!(No), a!(No), a!(No), a!(No), a!(No), a!(No)],
@@ -57,15 +61,15 @@ pub fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
         ]),
         layer!([
             [k!(LCtrl), k!(Tab), k!(LShift), k!(Enter), a!(No), a!(No)],
-            [k!(Minus), k!(Kc5), k!(Kc4), k!(WM(Kc4, LShift)), k!(Slash), a!(No)],
-            [k!(WM(Kc5, LShift)), k!(WM(Dot, LShift)), k!(Kc3), k!(WM(Kc3, LShift)), k!(WM(Comma, LShift)), a!(No)],
-            [k!(X), a!(No), k!(Kc2), k!(WM(Kc2, LShift)), k!(Escape), a!(No)],
-            [k!(Equal), k!(WM(Grave, LShift)), k!(Kc1), k!(WM(Kc1, LShift)), k!(Delete), a!(No)],
-            [k!(LAlt), k!(Backspace), k!(MO(4)), k!(Space), a!(No), a!(No)],
-            [k!(KpPlus), k!(WM(Minus, LShift)), k!(Kc7), k!(WM(Kc7, LShift)), k!(Kc6), a!(No)],
-            [k!(Comma), k!(WM(Semicolon, LShift)), k!(Kc8), k!(KpAsterisk), k!(WM(Kc6, LShift)), a!(No)],
-            [k!(Dot), k!(LGui), k!(Kc9), k!(WM(Kc9, LShift)), k!(Semicolon), a!(No)],
-            [k!(WM(Slash, LShift)), a!(No), k!(Kc0), k!(WM(Kc0, LShift)), k!(RightBracket), a!(No)]
+            [k!(Minus), k!(Kc5), k!(Kc4), wm!(Kc4, lshift), k!(Slash), a!(No)],
+            [wm!(Kc5, lshift), wm!(Dot, lshift), k!(Kc3), wm!(Kc3, lshift), wm!(Comma, lshift), a!(No)],
+            [k!(X), a!(No), k!(Kc2), wm!(Kc2, lshift), k!(Escape), a!(No)],
+            [k!(Equal), wm!(Grave, lshift), k!(Kc1), wm!(Kc1, lshift), k!(Delete), a!(No)],
+            [k!(LAlt), k!(Backspace), mo!(4), k!(Space), a!(No), a!(No)],
+            [k!(KpPlus), wm!(Minus, lshift), k!(Kc7), wm!(Kc7, lshift), k!(Kc6), a!(No)],
+            [k!(Comma), wm!(Semicolon, lshift), k!(Kc8), k!(KpAsterisk), wm!(Kc6, lshift), a!(No)],
+            [k!(Dot), k!(LGui), k!(Kc9), wm!(Kc9, lshift), k!(Semicolon), a!(No)],
+            [wm!(Slash, lshift), a!(No), k!(Kc0), wm!(Kc0, lshift), k!(RightBracket), a!(No)]
         ]),
         layer!([
             [a!(No), a!(No), a!(No), a!(No), a!(No), a!(No)],
@@ -177,10 +181,10 @@ pub fn get_default_keymap() -> [[[KeyAction; COL]; ROW]; NUM_LAYER] {
         ]),
         layer!([
             [a!(No), a!(No), a!(No), a!(No), a!(No), a!(No)],
-            [k!(WM(Kc4, LCtrl)), k!(WM(Kc5, LAlt)), k!(WM(Kc4, LAlt)), k!(WM(Kc8, LCtrl)), a!(No), a!(No)],
-            [k!(WM(Kc3, LCtrl)), k!(WM(Tab, LCtrl)), k!(WM(Kc3, LAlt)), k!(WM(Kc7, LCtrl)), k!(WM(Tab, LCtrl | LShift)), a!(No)],
-            [k!(WM(Kc2, LCtrl)), a!(No), k!(WM(Kc2, LAlt)), k!(WM(Kc6, LCtrl)), a!(No), a!(No)],
-            [k!(WM(Kc1, LCtrl)), k!(WM(Kc9, LCtrl)), k!(WM(Kc1, LAlt)), k!(WM(Kc5, LCtrl)), a!(No), a!(No)],
+            [wm!(Kc4, lctrl), wm!(Kc5, lalt), wm!(Kc4, lalt), wm!(Kc8, lctrl), a!(No), a!(No)],
+            [wm!(Kc3, lctrl), wm!(Tab, lctrl), wm!(Kc3, lalt), wm!(Kc7, lctrl), wm!(Tab, lctrl | lshift), a!(No)],
+            [wm!(Kc2, lctrl), a!(No), wm!(Kc2, lalt), wm!(Kc6, lctrl), a!(No), a!(No)],
+            [wm!(Kc1, lctrl), wm!(Kc9, lctrl), wm!(Kc1, lalt), wm!(Kc5, lctrl), a!(No), a!(No)],
             [a!(No), a!(No), a!(No), a!(No), a!(No), a!(No)],
             [a!(No), a!(No), a!(No), k!(User17), a!(No), a!(No)],
             [a!(No), a!(No), a!(No), k!(MouseBtn1), a!(No), a!(No)],
