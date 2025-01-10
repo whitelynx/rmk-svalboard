@@ -16,8 +16,8 @@ use embassy_rp::{
 };
 use panic_probe as _;
 use rmk::split::{peripheral::run_rmk_split_peripheral, SPLIT_MESSAGE_MAX_SIZE};
-use uart::BufferedHalfDuplexUart;
 use static_cell::StaticCell;
+use uart::BufferedHalfDuplexUart;
 
 bind_interrupts!(struct Irqs {
     USBCTRL_IRQ => InterruptHandler<USB>;
@@ -46,13 +46,9 @@ async fn main(_spawner: Spawner) {
     run_rmk_split_peripheral::<
         Input<'_>,
         Output<'_>,
-        _,  // S: Write + Read,
-        5,  // ROW: usize,
-        6   // COL: usize,
-    >(
-        input_pins,
-        output_pins,
-        uart_instance,
-    )
+        _, // S: Write + Read,
+        5, // ROW: usize,
+        6, // COL: usize,
+    >(input_pins, output_pins, uart_instance)
     .await;
 }

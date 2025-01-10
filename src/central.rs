@@ -29,8 +29,8 @@ use rmk::{
         SPLIT_MESSAGE_MAX_SIZE,
     },
 };
-use uart::BufferedHalfDuplexUart;
 use static_cell::StaticCell;
+use uart::BufferedHalfDuplexUart;
 use vial::{VIAL_KEYBOARD_DEF, VIAL_KEYBOARD_ID};
 
 bind_interrupts!(struct Irqs {
@@ -89,13 +89,13 @@ async fn main(spawner: Spawner) {
             Output<'_>,
             Driver<'_, USB>,
             Flash<peripherals::FLASH, Async, FLASH_SIZE>,
-            ROW,        // TOTAL_ROW: usize,
-            COL,        // TOTAL_COL: usize,
-            5,          // CENTRAL_ROW: usize,
-            6,          // CENTRAL_COL: usize,
-            0,          // CENTRAL_ROW_OFFSET: usize,
-            0,          // CENTRAL_COL_OFFSET: usize,
-            NUM_LAYER,  // NUM_LAYER: usize,
+            ROW,       // TOTAL_ROW: usize,
+            COL,       // TOTAL_COL: usize,
+            5,         // CENTRAL_ROW: usize,
+            6,         // CENTRAL_COL: usize,
+            0,         // CENTRAL_ROW_OFFSET: usize,
+            0,         // CENTRAL_COL_OFFSET: usize,
+            NUM_LAYER, // NUM_LAYER: usize,
         >(
             input_pins,
             output_pins,
@@ -106,11 +106,11 @@ async fn main(spawner: Spawner) {
             spawner,
         ),
         run_peripheral_monitor::<
-            5,  // ROW: usize,
-            6,  // COL: usize,
-            5,  // ROW_OFFSET: usize,
-            0,  // COL_OFFSET: usize,
-            _   // S: Read + Write,
+            5, // ROW: usize,
+            6, // COL: usize,
+            5, // ROW_OFFSET: usize,
+            0, // COL_OFFSET: usize,
+            _, // S: Read + Write,
         >(0, uart_receiver),
     )
     .await;
