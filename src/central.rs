@@ -17,8 +17,7 @@ use embassy_rp::{
     bind_interrupts,
     flash::{Async, Flash},
     gpio::{AnyPin, Input, Output},
-    peripherals::{self, UART0, USB},
-    uart::{self, BufferedUart},
+    peripherals::{self, USB},
     usb::{Driver, InterruptHandler},
 };
 // use embassy_rp::flash::Blocking;
@@ -53,7 +52,7 @@ async fn main(spawner: Spawner) {
     let (input_pins, output_pins) = config_matrix_pins_rp!(
         peripherals: p,
         input: [PIN_8, PIN_7, PIN_6, PIN_5, PIN_4],
-        output: [PIN_14, PIN_13, PIN_12, PIN_11, PIN_10, PIN_9],
+        output: [PIN_14, PIN_13, PIN_12, PIN_11, PIN_10, PIN_9]
     );
 
     // Use internal flash to emulate eeprom
@@ -63,7 +62,7 @@ async fn main(spawner: Spawner) {
 
     let keyboard_usb_config = KeyboardUsbConfig {
         vid: 0x303A,
-        id: 0x4044,
+        pid: 0x4044,
         manufacturer: "Svalboard",
         product_name: "lightly",
         serial_number: "vial:f64c2b3c:000001",
@@ -81,7 +80,7 @@ async fn main(spawner: Spawner) {
     let tx_buf = &mut TX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
     static RX_BUF: StaticCell<[u8; SPLIT_MESSAGE_MAX_SIZE]> = StaticCell::new();
     let rx_buf = &mut RX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
-    let uart_receiver = BufferedHalfDuplexUart::new(p.PIO0, p.PIN_1, tx_buf, rx_buf);
+    let uart_receiver = BufferedHalfDuplexUart::new(p.PIO0, p.PIN_0, tx_buf, rx_buf);
 
     // Start serving
     join(
