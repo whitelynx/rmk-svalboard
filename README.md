@@ -44,18 +44,22 @@ To flash, press the `Reset` button on the bottom of the Svalboard twice, then co
 
 3. Flash using debug probe
 
-   If you have a debug probe connected to your rp2040 board, flashing is quite simple: run the following command to automatically compile and flash RMK firmware to the board:
+   If you have a debug probe connected to your Svalboard, flashing is quite simple: run the following command to automatically compile and flash RMK firmware to the board:
 
    ```shell
    cargo run --release --bin central
    ```
 
+   You can use any CMSIS-DAP probe for this; if you don't already have one, you can make a very cheap one using an [RP2040-Zero][] (or any other RP2040 board) and flashing [Raspberry Pi's debugprobe firmware][] on it.
+
 4. (Optional) Flash using USB
 
-   If you don't have a debug probe, you can flash the UF2 file to each side using the RP2040's bootloader:
+   If you don't have a debug probe, and you don't need a debug console, you can flash the UF2 file to each side using the RP2040's bootloader:
 
-   1. Connect the target side of the keyboard directly to the computer via USB.
+   1. Connect the target side of the Svalboard directly to the computer via USB.
    2. Enter the bootloader, by holding the `BOOT` button, pressing and releasing `RESET`, and then releasing `BOOT`.
    3. Open the USB drive that appears. (mounting the drive first if necessary)
    4. Copy either `rmk-svalboard-central.uf2` or `rmk-svalboard-peripheral.uf2` to the USB drive, according to which part of the keyboard is currently connected.
 
+[RP2040-Zero]: https://www.waveshare.com/wiki/RP2040-Zero
+[Raspberry Pi's debugprobe firmware]: https://github.com/raspberrypi/debugprobe
