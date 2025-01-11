@@ -15,7 +15,8 @@ use embassy_rp::{
     usb::InterruptHandler,
 };
 use panic_probe as _;
-use rmk::split::{peripheral::run_rmk_split_peripheral, SPLIT_MESSAGE_MAX_SIZE};
+use rmk::config::{MatrixConfig, RmkConfig};
+use rmk::split::{peripheral::run_rmk_split_peripheral_with_config, SPLIT_MESSAGE_MAX_SIZE};
 use static_cell::StaticCell;
 use uart::BufferedHalfDuplexUart;
 
@@ -42,13 +43,23 @@ async fn main(_spawner: Spawner) {
     let rx_buf = &mut RX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
     let uart_instance = BufferedHalfDuplexUart::new(p.PIO0, p.PIN_1, tx_buf, rx_buf);
 
+    let matrix_config = MatrixConfig {
+        sample_delay_micros: 90,
+        scan_delay_micros: 100,
+    };
+
+    let keyboard_config = RmkConfig {
+        matrix_config,
+        ..Default::default()
+    };
+
     // Start serving
-    run_rmk_split_peripheral::<
+    run_rmk_split_peripheral_with_config::<
         Input<'_>,
         Output<'_>,
         _, // S: Write + Read,
         5, // ROW: usize,
         6, // COL: usize,
-    >(input_pins, output_pins, uart_instance)
+    >(input_pins, output_pins, keyboard_config, uart_instance)
     .await;
 }

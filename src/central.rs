@@ -23,7 +23,7 @@ use embassy_rp::{
 // use embassy_rp::flash::Blocking;
 use panic_probe as _;
 use rmk::{
-    config::{KeyboardUsbConfig, RmkConfig, VialConfig},
+    config::{KeyboardUsbConfig, MatrixConfig, RmkConfig, VialConfig},
     split::{
         central::{run_peripheral_monitor, run_rmk_split_central},
         SPLIT_MESSAGE_MAX_SIZE,
@@ -70,9 +70,15 @@ async fn main(spawner: Spawner) {
 
     let vial_config = VialConfig::new(VIAL_KEYBOARD_ID, VIAL_KEYBOARD_DEF);
 
+    let matrix_config = MatrixConfig {
+        sample_delay_micros: 90,
+        scan_delay_micros: 100,
+    };
+
     let keyboard_config = RmkConfig {
         usb_config: keyboard_usb_config,
         vial_config,
+        matrix_config,
         ..Default::default()
     };
 
