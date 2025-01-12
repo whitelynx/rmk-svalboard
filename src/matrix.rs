@@ -72,13 +72,16 @@ impl<
                                 self.key_states[out_idx][in_idx],
                             );
 
-                            // row is finger/thumb (4 and 5 are thumbs), col is position in the cluster.
-                            // We want to invert center keys in all finger clusters.
+                            // row is finger/thumb (0 and 5 are thumbs), col is position in the cluster.
+                            // We want to invert down/center (2) keys in all finger clusters, and
+                            // double-down (5) in thumb clusters.
                             let pressed = match (out_idx + ROW_OFFSET, in_idx + COL_OFFSET) {
-                                (0, 2)
+                                (0, 5)
                                 | (1, 2)
                                 | (2, 2)
                                 | (3, 2)
+                                | (4, 2)
+                                | (5, 5)
                                 | (6, 2)
                                 | (7, 2)
                                 | (8, 2)
