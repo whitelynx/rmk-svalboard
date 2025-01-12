@@ -5,10 +5,12 @@
 mod keymap;
 #[macro_use]
 mod macros;
+mod matrix;
 mod uart;
 mod vial;
 
 use crate::keymap::{COL, NUM_LAYER, ROW};
+use crate::matrix::Matrix;
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
@@ -23,9 +25,10 @@ use embassy_rp::{
 // use embassy_rp::flash::Blocking;
 use panic_probe as _;
 use rmk::{
-    config::{KeyboardUsbConfig, MatrixConfig, RmkConfig, VialConfig},
+    debounce::{default_bouncer::DefaultDebouncer, DebouncerTrait},
+    config::{KeyboardUsbConfig, RmkConfig, VialConfig},
     split::{
-        central::{run_peripheral_monitor, run_rmk_split_central},
+        central::{run_peripheral_monitor, run_rmk_split_central_with_matrix},
         SPLIT_MESSAGE_MAX_SIZE,
     },
 };
@@ -70,15 +73,9 @@ async fn main(spawner: Spawner) {
 
     let vial_config = VialConfig::new(VIAL_KEYBOARD_ID, VIAL_KEYBOARD_DEF);
 
-    let matrix_config = MatrixConfig {
-        sample_delay_micros: 90,
-        scan_delay_micros: 100,
-    };
-
     let keyboard_config = RmkConfig {
         usb_config: keyboard_usb_config,
         vial_config,
-        matrix_config,
         ..Default::default()
     };
 
@@ -88,23 +85,30 @@ async fn main(spawner: Spawner) {
     let rx_buf = &mut RX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
     let uart_receiver = BufferedHalfDuplexUart::new(p.PIO0, p.PIN_0, tx_buf, rx_buf);
 
+    let debouncer = DefaultDebouncer::<6, 5>::new();
+
+    let matrix = Matrix::<
+        _,
+        _,
+        _,
+        0, // const ROW_OFFSET: usize,
+        0, // const COL_OFFSET: usize,
+        6, // const INPUT_PIN_NUM: usize, (COL for row2col)
+        5, // const OUTPUT_PIN_NUM: usize, (ROW for row2col)
+    >::new(input_pins, output_pins, debouncer);
+
     // Start serving
     join(
-        run_rmk_split_central::<
-            Input<'_>,
+        run_rmk_split_central_with_matrix::<
             Output<'_>,
+            _,
             Driver<'_, USB>,
             Flash<peripherals::FLASH, Async, FLASH_SIZE>,
             ROW,       // TOTAL_ROW: usize,
             COL,       // TOTAL_COL: usize,
-            5,         // CENTRAL_ROW: usize,
-            6,         // CENTRAL_COL: usize,
-            0,         // CENTRAL_ROW_OFFSET: usize,
-            0,         // CENTRAL_COL_OFFSET: usize,
             NUM_LAYER, // NUM_LAYER: usize,
         >(
-            input_pins,
-            output_pins,
+            matrix,
             driver,
             flash,
             &mut keymap::get_default_keymap(),

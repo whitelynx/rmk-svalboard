@@ -3,8 +3,10 @@
 
 #[macro_use]
 mod macros;
+mod matrix;
 mod uart;
 
+use crate::matrix::Matrix;
 use defmt::*;
 use defmt_rtt as _;
 use embassy_executor::Spawner;
@@ -15,8 +17,8 @@ use embassy_rp::{
     usb::InterruptHandler,
 };
 use panic_probe as _;
-use rmk::config::{MatrixConfig, RmkConfig};
-use rmk::split::{peripheral::run_rmk_split_peripheral_with_config, SPLIT_MESSAGE_MAX_SIZE};
+use rmk::debounce::{default_bouncer::DefaultDebouncer, DebouncerTrait};
+use rmk::split::{peripheral::run_rmk_split_peripheral_with_matrix, SPLIT_MESSAGE_MAX_SIZE};
 use static_cell::StaticCell;
 use uart::BufferedHalfDuplexUart;
 
@@ -33,8 +35,8 @@ async fn main(_spawner: Spawner) {
     // Pin config
     let (input_pins, output_pins) = config_matrix_pins_rp!(
         peripherals: p,
-        input: [PIN_8, PIN_7, PIN_6, PIN_5, PIN_4],
-        output: [PIN_14, PIN_13, PIN_12, PIN_11, PIN_10, PIN_9]
+        input: [PIN_14, PIN_13, PIN_12, PIN_11, PIN_10, PIN_9],
+        output: [PIN_8, PIN_7, PIN_6, PIN_5, PIN_4]
     );
 
     static TX_BUF: StaticCell<[u8; SPLIT_MESSAGE_MAX_SIZE]> = StaticCell::new();
@@ -43,23 +45,24 @@ async fn main(_spawner: Spawner) {
     let rx_buf = &mut RX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
     let uart_instance = BufferedHalfDuplexUart::new(p.PIO0, p.PIN_1, tx_buf, rx_buf);
 
-    let matrix_config = MatrixConfig {
-        sample_delay_micros: 90,
-        scan_delay_micros: 100,
-    };
+    let debouncer = DefaultDebouncer::<6, 5>::new();
 
-    let keyboard_config = RmkConfig {
-        matrix_config,
-        ..Default::default()
-    };
+    let matrix = Matrix::<
+        _,
+        _,
+        _,
+        0, // const ROW_OFFSET: usize,
+        0, // const COL_OFFSET: usize,
+        6, // const INPUT_PIN_NUM: usize, (COL for row2col)
+        5, // const OUTPUT_PIN_NUM: usize, (ROW for row2col)
+    >::new(input_pins, output_pins, debouncer);
 
     // Start serving
-    run_rmk_split_peripheral_with_config::<
-        Input<'_>,
-        Output<'_>,
+    run_rmk_split_peripheral_with_matrix::<
+        _, // M: MatrixTrait,
         _, // S: Write + Read,
         5, // ROW: usize,
         6, // COL: usize,
-    >(input_pins, output_pins, keyboard_config, uart_instance)
+    >(matrix, uart_instance)
     .await;
 }
