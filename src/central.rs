@@ -25,8 +25,8 @@ use embassy_rp::{
 // use embassy_rp::flash::Blocking;
 use panic_probe as _;
 use rmk::{
-    debounce::{default_bouncer::DefaultDebouncer, DebouncerTrait},
     config::{KeyboardUsbConfig, RmkConfig, VialConfig},
+    debounce::{default_bouncer::DefaultDebouncer, DebouncerTrait},
     split::{
         central::{run_peripheral_monitor, run_rmk_split_central_with_matrix},
         SPLIT_MESSAGE_MAX_SIZE,
