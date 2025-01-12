@@ -39,8 +39,7 @@ impl<
         const COL_OFFSET: usize,
         const INPUT_PIN_NUM: usize,
         const OUTPUT_PIN_NUM: usize,
-    > MatrixTrait
-    for Matrix<In, Out, D, ROW_OFFSET, COL_OFFSET, INPUT_PIN_NUM, OUTPUT_PIN_NUM>
+    > MatrixTrait for Matrix<In, Out, D, ROW_OFFSET, COL_OFFSET, INPUT_PIN_NUM, OUTPUT_PIN_NUM>
 {
     const ROW: usize = OUTPUT_PIN_NUM;
     const COL: usize = INPUT_PIN_NUM;
@@ -53,7 +52,7 @@ impl<
             // Scan matrix and send report
             for (out_idx, out_pin) in self.output_pins.iter_mut().enumerate() {
                 // Pull up output pin, wait 1us ensuring the change comes into effect
-                out_pin.set_high().ok();
+                out_pin.set_low().ok();
                 Timer::after_micros(90).await;
                 for (in_idx, in_pin) in self.input_pins.iter_mut().enumerate() {
                     // Check input pins and debounce
@@ -68,18 +67,26 @@ impl<
                         DebounceState::Debounced => {
                             self.key_states[out_idx][in_idx].toggle_pressed();
                             let (row, col, key_state) = (
-                                (out_idx + ROW_OFFSET) as u8,
-                                (in_idx + COL_OFFSET) as u8,
+                                out_idx as u8,
+                                in_idx as u8,
                                 self.key_states[out_idx][in_idx],
                             );
 
-                            KEY_EVENT_CHANNEL
-                                .send(KeyEvent {
-                                    row,
-                                    col,
-                                    pressed: key_state.pressed,
-                                })
-                                .await;
+                            // row is finger/thumb (4 and 5 are thumbs), col is position in the cluster.
+                            // We want to invert center keys in all finger clusters.
+                            let pressed = match (out_idx + ROW_OFFSET, in_idx + COL_OFFSET) {
+                                (0, 2)
+                                | (1, 2)
+                                | (2, 2)
+                                | (3, 2)
+                                | (6, 2)
+                                | (7, 2)
+                                | (8, 2)
+                                | (9, 2) => key_state.pressed,
+                                _ => !key_state.pressed,
+                            };
+
+                            KEY_EVENT_CHANNEL.send(KeyEvent { row, col, pressed }).await;
                         }
                         _ => (),
                     }
@@ -89,7 +96,7 @@ impl<
                         self.scan_start = Some(Instant::now());
                     }
                 }
-                out_pin.set_low().ok();
+                out_pin.set_high().ok();
             }
 
             Timer::after_micros(100).await;
@@ -118,7 +125,7 @@ impl<
         }
         // First, set all output pin to high
         for out in self.output_pins.iter_mut() {
-            out.set_high().ok();
+            out.set_low().ok();
         }
         Timer::after_micros(1).await;
         info!("Waiting for high");
@@ -131,7 +138,7 @@ impl<
 
         // Set all output pins back to low
         for out in self.output_pins.iter_mut() {
-            out.set_low().ok();
+            out.set_high().ok();
         }
 
         self.scan_start = Some(Instant::now());
