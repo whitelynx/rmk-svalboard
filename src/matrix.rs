@@ -1,7 +1,6 @@
 use defmt::info;
-use embassy_time::{Instant, Timer};
+use embassy_time::Timer;
 use embedded_hal::digital::{InputPin, OutputPin};
-use embedded_hal_async::digital::Wait;
 use rmk::{
     debounce::{DebounceState, DebouncerTrait},
     event::KeyEvent,
@@ -11,7 +10,7 @@ use rmk::{
 
 /// Matrix is the physical pcb layout of the keyboard matrix.
 pub struct Matrix<
-    In: Wait + InputPin,
+    In: InputPin,
     Out: OutputPin,
     D: DebouncerTrait,
     const ROW_OFFSET: usize,
@@ -27,12 +26,10 @@ pub struct Matrix<
     debouncer: D,
     /// Key state matrix
     key_states: [[KeyState; INPUT_PIN_NUM]; OUTPUT_PIN_NUM],
-    /// Start scanning
-    scan_start: Option<Instant>,
 }
 
 impl<
-        In: Wait + InputPin,
+        In: InputPin,
         Out: OutputPin,
         D: DebouncerTrait,
         const ROW_OFFSET: usize,
@@ -47,8 +44,6 @@ impl<
     async fn scan(&mut self) {
         info!("Matrix scanning");
         loop {
-            self.wait_for_key().await;
-
             // Scan matrix and send report
             for (out_idx, out_pin) in self.output_pins.iter_mut().enumerate() {
                 // Pull up output pin, wait 1us ensuring the change comes into effect
@@ -93,11 +88,6 @@ impl<
                         }
                         _ => (),
                     }
-
-                    // If there's key still pressed, always refresh the self.scan_start
-                    if self.key_states[out_idx][in_idx].pressed {
-                        self.scan_start = Some(Instant::now());
-                    }
                 }
                 out_pin.set_high().ok();
             }
@@ -113,43 +103,10 @@ impl<
     fn update_key_state(&mut self, row: usize, col: usize, f: impl FnOnce(&mut KeyState)) {
         f(&mut self.key_states[row][col]);
     }
-
-    async fn wait_for_key(&mut self) {
-        use embassy_futures::select::select_slice;
-        use heapless::Vec;
-
-        if let Some(start_time) = self.scan_start {
-            // If not key over 2 secs, wait for interupt in next loop
-            if start_time.elapsed().as_secs() < 1 {
-                return;
-            } else {
-                self.scan_start = None;
-            }
-        }
-        // First, set all output pin to high
-        for out in self.output_pins.iter_mut() {
-            out.set_low().ok();
-        }
-        Timer::after_micros(1).await;
-        info!("Waiting for high");
-        let mut futs: Vec<_, INPUT_PIN_NUM> = self
-            .input_pins
-            .iter_mut()
-            .map(|input_pin| input_pin.wait_for_high())
-            .collect();
-        let _ = select_slice(futs.as_mut_slice()).await;
-
-        // Set all output pins back to low
-        for out in self.output_pins.iter_mut() {
-            out.set_high().ok();
-        }
-
-        self.scan_start = Some(Instant::now());
-    }
 }
 
 impl<
-        In: Wait + InputPin,
+        In: InputPin,
         Out: OutputPin,
         D: DebouncerTrait,
         const ROW_OFFSET: usize,
@@ -169,7 +126,6 @@ impl<
             output_pins,
             debouncer,
             key_states: [[KeyState::default(); INPUT_PIN_NUM]; OUTPUT_PIN_NUM],
-            scan_start: None,
         }
     }
 }

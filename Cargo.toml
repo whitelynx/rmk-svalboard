@@ -10,10 +10,10 @@ edition = "2021"
 license = "MIT OR Apache-2.0"
 
 [dependencies]
-#rmk = { version = "0.5", default-features = false, features = ["defmt", "async_matrix", "split"] }
-#rmk = { git = "https://github.com/grabpot/rmk.git", branch = "fix/splitserial", default-features = false, features = ["defmt", "async_matrix", "split"] }
-rmk = { git = "https://github.com/whitelynx/rmk.git", branch = "feat/custom-matrix", default-features = false, features = ["defmt", "async_matrix", "split"] }
-#rmk = { path = "../../Other/rmk/rmk", default-features = false, features = ["defmt", "async_matrix", "split"] }
+#rmk = { version = "0.5", default-features = false, features = ["defmt", "split"] }
+#rmk = { git = "https://github.com/grabpot/rmk.git", branch = "fix/splitserial", default-features = false, features = ["defmt", "split"] }
+rmk = { git = "https://github.com/whitelynx/rmk.git", branch = "feat/custom-matrix", default-features = false, features = ["defmt", "split"] }
+#rmk = { path = "../../Other/rmk/rmk", default-features = false, features = ["defmt", "split"] }
 embassy-time = { version = "0.3", features = ["defmt"] }
 embassy-rp = { version = "0.2", features = [
     "defmt",
