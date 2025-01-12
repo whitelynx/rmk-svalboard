@@ -51,7 +51,7 @@ async fn main(_spawner: Spawner) {
         _,
         _,
         _,
-        0, // const ROW_OFFSET: usize,
+        5, // const ROW_OFFSET: usize,
         0, // const COL_OFFSET: usize,
         6, // const INPUT_PIN_NUM: usize, (COL for row2col)
         5, // const OUTPUT_PIN_NUM: usize, (ROW for row2col)
