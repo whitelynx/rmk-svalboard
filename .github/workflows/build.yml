@@ -17,12 +17,12 @@ jobs:
         run: wget http://nz2.archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2_amd64.deb && sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2_amd64.deb
       - name: Build firmware
         run: cargo make uf2 --release
-      - name: Upload artifacts
+      - name: Upload UF2 artifacts
         uses: actions/upload-artifact@v4
         with:
           name: firmware_uf2
           path: '*.uf2'
-      - name: Upload artifacts
+      - name: Upload hex artifacts
         uses: actions/upload-artifact@v4
         with:
           name: firmware_hex
