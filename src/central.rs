@@ -25,7 +25,7 @@ use embassy_rp::{
 // use embassy_rp::flash::Blocking;
 use panic_probe as _;
 use rmk::{
-    config::{KeyboardUsbConfig, RmkConfig, VialConfig},
+    config::{KeyboardUsbConfig, RmkConfig, StorageConfig, VialConfig},
     debounce::{default_bouncer::DefaultDebouncer, DebouncerTrait},
     split::{
         central::{run_peripheral_monitor, run_rmk_split_central_with_matrix},
@@ -71,9 +71,15 @@ async fn main(spawner: Spawner) {
         serial_number: "vial:f64c2b3c:000001",
     };
 
+    let storage_config = StorageConfig {
+        num_sectors: 16,
+        ..Default::default()
+    };
+
     let vial_config = VialConfig::new(VIAL_KEYBOARD_ID, VIAL_KEYBOARD_DEF);
 
     let keyboard_config = RmkConfig {
+        storage_config,
         usb_config: keyboard_usb_config,
         vial_config,
         ..Default::default()
