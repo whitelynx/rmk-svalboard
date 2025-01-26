@@ -43,7 +43,7 @@ async fn main(_spawner: Spawner) {
     let tx_buf = &mut TX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
     static RX_BUF: StaticCell<[u8; SPLIT_MESSAGE_MAX_SIZE]> = StaticCell::new();
     let rx_buf = &mut RX_BUF.init([0; SPLIT_MESSAGE_MAX_SIZE])[..];
-    let uart_instance = BufferedHalfDuplexUart::new(p.PIO0, p.PIN_1, tx_buf, rx_buf);
+    let uart_instance = BufferedHalfDuplexUart::new(p.PIO0, p.PIN_0, tx_buf, rx_buf);
 
     let debouncer = DefaultDebouncer::<6, 5>::new();
 
